@@ -35,11 +35,25 @@ const UserLogin = () => {
     phoneNum: '',
   });
   const [userCount, setUserCount] = useState(0);
+  const [userList, setUserList] = useState([]);
   const changeUserInfo = e => {
     const { name, value } = e.target;
     setUserInfo(u => ({ ...u, [name]: value }));
   };
-
+  const getUserList = e => {
+    get(child(dbRef, `USER/`))
+      .then(snapshot => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          setUserList(data);
+        } else {
+          console.log('No data available');
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
   const createUser = e => {
     // e.preventDefault();
     get(child(dbRef, `USER/`))
@@ -48,7 +62,7 @@ const UserLogin = () => {
           const data = snapshot.val();
           let count = data.length;
           set(ref(db, 'USER/' + count), {
-            userInfo,
+            ...userInfo,
           });
         } else {
           console.log('No data available');
@@ -58,6 +72,23 @@ const UserLogin = () => {
         console.error(error);
       });
   };
+  const login = e => {
+    let checkUser = userList.find(u => {
+      if (u != undefined) {
+        if (
+          u.userInfo.userName == userInfo.userName &&
+          u.userInfo.userPwd == userInfo.userPwd
+        )
+          return u;
+      }
+    });
+    if (checkUser != undefined) {
+      console.log('Success');
+    } else {
+      console.log('failed');
+    }
+  };
+  getUserList();
   return (
     <Container fluid='sm'>
       <Row height='100%'>&nbsp;</Row>
@@ -97,7 +128,12 @@ const UserLogin = () => {
           <Col></Col>
         </Form.Group>
         <Row>
-          <Col> </Col>
+          <Col></Col>
+          <Col>
+            <Button variant='primary' onClick={login}>
+              登入
+            </Button>{' '}
+          </Col>
           <Col>
             {' '}
             <Button variant='primary' onClick={createUser}>

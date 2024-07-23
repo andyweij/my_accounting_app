@@ -2,6 +2,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'semantic-ui-css/semantic.min.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { FaBeer } from 'react-icons/fa';
 // import './index.css';
 // import App from './App';
 // import reportWebVitals from './reportWebVitals';

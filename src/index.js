@@ -8,6 +8,7 @@ import { FaBeer } from 'react-icons/fa';
 // import reportWebVitals from './reportWebVitals';
 // import Test from './view/Test';
 import UserLogin from './view/UserLogin';
+import UserLoginByFireStore from './view/UserLoginByFireStore';
 import AccountRecord from './view/AccountRecord';
 import SidebarMenu from './view/SidebarMenu';
 import MyCalendar from './view/MyCalendar';
@@ -16,7 +17,7 @@ import { BrowserRouter } from 'react-router-dom';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
-    <MyCalendar />
+    <SidebarMenu />
   </BrowserRouter>,
 );
 

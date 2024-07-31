@@ -19,8 +19,18 @@ import {
   getDataBaseData,
   createDataByPath,
   createDataByDate,
+  getDataByDay,
 } from '../util/UtilFireBase';
 import { FaPlus } from 'react-icons/fa';
+import {
+  collection,
+  doc,
+  setDoc,
+  getFirestore,
+  getDoc,
+  docRef,
+} from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
 
 const MyCalendar = () => {
   const [show, setShow] = useState(false);
@@ -36,13 +46,13 @@ const MyCalendar = () => {
   const weekDays = { nl: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] };
   const [monthOfDays, setMonthOfDays] = useState([]);
   const getClassificationList = e => {
-    getDataBaseData('classification/')
-      .then(data => {
-        setClassificationList(data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
+    // getDataBaseData('classification/')
+    //   .then(data => {
+    //     setClassificationList(data);
+    //   })
+    //   .catch(error => {
+    //     console.error('Error fetching data:', error);
+    //   });
   };
   const formatDate = date => {
     const year = date.getFullYear();
@@ -98,17 +108,24 @@ const MyCalendar = () => {
       setCurrentMonth(currentMonth + 1);
     }
   };
-  const getDataByDate = e => {
+  const getDataByDate = async e => {
     let day = e.target.value;
-    getDataBaseData(
-      'Accounting/' + currentYear + '/' + (currentMonth + 1) + '/' + day + '/',
-    );
+    let yearMonth =
+      currentYear +
+      (currentMonth + 1 < 10 ? '0' + (currentMonth + 1) : currentMonth + 1);
+    console.log(day);
+    let result = await getDataByDay({
+      path: 'account',
+      date: yearMonth,
+      day: day,
+    });
     setShow(true);
+    console.log(result);
   };
   const addItem = e => {
     let newList = classificationList;
     newList.push(newItem);
-    createDataByPath('classification/', newList);
+    // createDataByPath('classification/', newList);
     setClassificationList(list => [...list, newItem]);
   };
   useEffect(() => {
@@ -138,11 +155,12 @@ const MyCalendar = () => {
     }
   };
   const addAccount = e => {
-    createDataByDate(
-      currentYear + '/' + currentMonth + '/' + account.classification,
-      account.amount,
-    );
+    // createDataByDate(
+    //   currentYear + '/' + currentMonth + '/' + account.classification,
+    //   account.amount,
+    // );
   };
+
   return (
     <Container className='d-flex justify-content-center mt-5 '>
       <Table striped bordered hover>
@@ -155,7 +173,12 @@ const MyCalendar = () => {
               </a>
               <input
                 type='month'
-                style={{ textAlign: 'center' }}
+                style={{
+                  textAlign: 'center',
+                  borderRadius: 10,
+                  padding: 5,
+                  fontsize: 16,
+                }}
                 size={1}
                 value={
                   currentYear +

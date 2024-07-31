@@ -25,19 +25,20 @@ import {
   Segment,
   Sidebar,
 } from 'semantic-ui-react';
+import MyCalendar from './MyCalendar';
+import { Link, Routes, Route, useNavigate } from 'react-router-dom';
 const SidebarMenu = () => {
   return (
     <Container>
       <Row></Row>
-      <Nav fill variant='tabs' defaultActiveKey='/home'>
+      <Nav fill variant='tabs'>
         <Nav.Item>
           <Nav.Link href='/home'>Active</Nav.Link>
         </Nav.Item>
         <Nav.Item>
-          <Nav.Link eventKey='link-1'>Loooonger NavLink</Nav.Link>
-        </Nav.Item>
-        <Nav.Item>
-          <Nav.Link eventKey='link-2'>Link</Nav.Link>
+          <Nav.Link as={Link} eventKey='MyCalendar' to='/MyCalendar'>
+            MyCalendar
+          </Nav.Link>
         </Nav.Item>
         <Nav.Item>
           <Nav.Link eventKey='disabled' disabled>
@@ -45,6 +46,9 @@ const SidebarMenu = () => {
           </Nav.Link>
         </Nav.Item>
       </Nav>
+      <Routes>
+        <Route path='MyCalendar' element={<MyCalendar />} />
+      </Routes>
     </Container>
   );
 };

@@ -1,6 +1,15 @@
-import { getDatabase, ref, set, child, get, onValue } from 'firebase/database';
 import { initializeApp } from 'firebase/app';
-
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  docRef,
+  query,
+  where,
+  collection,
+  getDocs,
+} from 'firebase/firestore';
 const firebaseConfig = {
   apiKey: 'AIzaSyA0yKuFTNSGZmQo_dq6x27Lb8LzSc7JhqE',
   authDomain: 'myaccountingmanagement.firebaseapp.com',
@@ -11,71 +20,35 @@ const firebaseConfig = {
   appId: '1:244066512651:web:fbccbda7489d17f9783c0e',
   measurementId: 'G-Y9V1V0P2Z7',
 };
+
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const dbRef = ref(getDatabase());
 
-// export const getDataBaseData = e => {
-//   let rs;
-//   console.log(e);
-//   get(child(dbRef, e))
-//     .then(snapshot => {
-//       if (snapshot.exists()) {
-//         const data = snapshot.val();
-//         rs = data;
-//       } else {
-//         console.log('No data available');
-//       }
-//     })
-//     .catch(error => {
-//       console.error(error);
-//     });
-// };
-export const getDataBaseData = path => {
-  return new Promise((resolve, reject) => {
-    get(child(dbRef, path))
-      .then(snapshot => {
-        if (snapshot.exists()) {
-          resolve(snapshot.val());
-        } else {
-          resolve(null);
-        }
-      })
-      .catch(error => {
-        reject(error);
-      });
+const db = getFirestore(app);
+
+export const getDataByDay = async param => {
+  console.log(param);
+  const dataMainPath = collection(db, param.path);
+  const docRef = doc(dataMainPath, param.date);
+  const dayInfo = collection(docRef, param.day);
+
+  const docSnap = await getDocs(dayInfo);
+  const result = {};
+  docSnap.forEach(doc => {
+    result[doc.id] = doc.data();
   });
+  return result;
+  // if (docSnap.exists()) {
+  //   console.log('Document data:', docSnap.data());
+  // } else {
+  //   // docSnap.data() will be undefined in this case
+  //   console.log('No such document!');
+  // }
 };
-export const createDataByPath = (path, newList) => {
-  get(child(dbRef, path))
-    .then(snapshot => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        set(ref(db, 'classification/'), {
-          ...newList,
-        });
-      } else {
-        console.log('No data available');
-      }
-    })
-    .catch(error => {
-      console.error(error);
-    });
-};
-
-export const createDataByDate = (path, info) => {
-  get(child(dbRef, path))
-    .then(snapshot => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        set(ref(db, 'classification/'), {
-          ...info,
-        });
-      } else {
-        console.log('No data available');
-      }
-    })
-    .catch(error => {
-      console.error(error);
-    });
+export const createDataByFireStore = async () => {
+  // Add a new document in collection "cities"
+  await setDoc(doc(db, 'cities', 'LA'), {
+    name: 'Los Angeles',
+    state: 'CA',
+    country: 'USA',
+  });
 };

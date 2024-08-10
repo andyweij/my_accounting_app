@@ -18,7 +18,7 @@ import { BiSolidLeftArrow, BiSolidRightArrow } from 'react-icons/bi';
 import {
   getDataBaseData,
   createDataByPath,
-  createDataByDate,
+  createDataByFireStore,
   getDataByDay,
   getItemList,
 } from '../util/UtilFireBase';
@@ -44,18 +44,15 @@ const MyCalendar = () => {
       const subjects = await getItemList()
       Object.entries(subjects).map(o=>{
         if(o[0]=='類別'){
-          setSubject(o[1].消費)  
-          console.log(o[1].消費)  
+          setSubject(o[1].data)  
         }
       })
       
-    } ;
+    };
     setItems();
-    console.log(subject.length)
+ 
   },[subject.length])
-  useEffect(() => {
-    getClassificationList();
-  }, [classificationList.length]); // 依赖数组为空，只在组件初次渲染时调用
+
   const handleClose = () => setShow(false);
   const [newItem, setNewItem] = useState('');
   
@@ -141,10 +138,9 @@ const MyCalendar = () => {
     setShow(true);
   };
   const addItem = e => {
-    let newList = classificationList;
-    newList.push(newItem);
-    // createDataByPath('classification/', newList);
-    setClassificationList(list => [...list, newItem]);
+    createDataByFireStore('item/類別', newItem);
+    setSubject(list => [...list, newItem]);
+    setNewItem('')
   };
   useEffect(() => {
     initMonth(currentYear, currentMonth);

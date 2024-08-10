@@ -4,10 +4,12 @@ import {
   doc,
   setDoc,
   getDoc,
+  updateDoc,
   docRef,
   query,
   where,
   collection,
+  arrayUnion,
   getDocs,
 } from 'firebase/firestore';
 const firebaseConfig = {
@@ -46,10 +48,6 @@ export const getDataByDay = async param => {
 };
 export const getItemList = async () => {
   let dataMainPath = collection(db, 'item');
-
-  // for(let i=0;i<param.length;i++){
-
-  // }
   const docSnap = await getDocs(dataMainPath);
   const result = {};
   docSnap.forEach(doc => {
@@ -57,11 +55,14 @@ export const getItemList = async () => {
   });
   return result;
 };
-export const createDataByFireStore = async () => {
-  // Add a new document in collection "cities"
-  await setDoc(doc(db, 'cities', 'LA'), {
-    name: 'Los Angeles',
-    state: 'CA',
-    country: 'USA',
-  });
+export const createDataByFireStore = async (path ,newItem)=> {
+
+const docRef = doc(db,path)
+await updateDoc(docRef, {
+  data: arrayUnion(newItem)
+});
+
+  // await setDoc(doc(db, path), {
+  //   data
+  // });
 };

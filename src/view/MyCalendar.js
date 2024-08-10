@@ -20,6 +20,7 @@ import {
   createDataByPath,
   createDataByDate,
   getDataByDay,
+  getItemList,
 } from '../util/UtilFireBase';
 import { FaPlus } from 'react-icons/fa';
 import {
@@ -37,6 +38,7 @@ const MyCalendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [classificationList, setClassificationList] = useState([]);
+
   useEffect(() => {
     getClassificationList();
   }, [classificationList.length]); // 依赖数组为空，只在组件初次渲染时调用
@@ -45,6 +47,8 @@ const MyCalendar = () => {
 
   const weekDays = { nl: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] };
   const [monthOfDays, setMonthOfDays] = useState([]);
+  const [infoCard, setInfoCard] = useState([]);
+  useEffect(() => {}, [infoCard]);
   const getClassificationList = e => {
     // getDataBaseData('classification/')
     //   .then(data => {
@@ -113,14 +117,15 @@ const MyCalendar = () => {
     let yearMonth =
       currentYear +
       (currentMonth + 1 < 10 ? '0' + (currentMonth + 1) : currentMonth + 1);
-    console.log(day);
     let result = await getDataByDay({
       path: 'account',
       date: yearMonth,
       day: day,
     });
+    // let items = await getItemList();
+    // console.log(items);
+    setInfoCard(result);
     setShow(true);
-    console.log(result);
   };
   const addItem = e => {
     let newList = classificationList;
@@ -237,6 +242,30 @@ const MyCalendar = () => {
           <Modal.Title>帳務紀錄</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <Card>
+            <Card.Header as='h5'>項目</Card.Header>
+            <Card.Body>
+              <Card.Title></Card.Title>
+              <Card.Text>
+                {Object.entries(infoCard).map(([category, details]) => (
+                  <div key={category}>
+                    <h6>{category}</h6>
+                    {Object.entries(details).map(([item, prices]) => (
+                      <div key={item}>
+                        <ul>
+                          <strong>{item}:</strong>
+                          {prices.reduce((total, p) => {
+                            return (total += p);
+                          })}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </Card.Text>
+            </Card.Body>
+          </Card>
+          <br />
           <Nav variant='tabs' activeKey={activeKey} onSelect={handleSelect}>
             <Nav.Item>
               <Nav.Link href='#'>支出</Nav.Link>

@@ -33,7 +33,9 @@ const SidebarMenu = () => {
       <Row></Row>
       <Nav fill variant='tabs'>
         <Nav.Item>
-          <Nav.Link href='/home'>Active</Nav.Link>
+          <Nav.Link as={Link} eventKey='home' to='/home'>
+            Home
+          </Nav.Link>
         </Nav.Item>
         <Nav.Item>
           <Nav.Link as={Link} eventKey='MyCalendar' to='/MyCalendar'>

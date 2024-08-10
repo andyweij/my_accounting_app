@@ -44,6 +44,19 @@ export const getDataByDay = async param => {
   //   console.log('No such document!');
   // }
 };
+export const getItemList = async param => {
+  let dataMainPath = collection(db, 'item');
+  let docRef = doc(dataMainPath, '類別');
+  // for(let i=0;i<param.length;i++){
+
+  // }
+  const docSnap = await getDocs(docRef);
+  const result = {};
+  // docSnap.forEach(doc => {
+  //   result[doc.id] = doc.data();
+  // });
+  // return result;
+};
 export const createDataByFireStore = async () => {
   // Add a new document in collection "cities"
   await setDoc(doc(db, 'cities', 'LA'), {

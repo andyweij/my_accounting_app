@@ -38,13 +38,27 @@ const MyCalendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [classificationList, setClassificationList] = useState([]);
-
+  const [subject,setSubject] = useState([])
+  useEffect(()=>{
+    const setItems = async()=>{
+      const subjects = await getItemList()
+      Object.entries(subjects).map(o=>{
+        if(o[0]=='類別'){
+          setSubject(o[1].消費)  
+          console.log(o[1].消費)  
+        }
+      })
+      
+    } ;
+    setItems();
+    console.log(subject.length)
+  },[subject.length])
   useEffect(() => {
     getClassificationList();
   }, [classificationList.length]); // 依赖数组为空，只在组件初次渲染时调用
   const handleClose = () => setShow(false);
   const [newItem, setNewItem] = useState('');
-
+  
   const weekDays = { nl: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] };
   const [monthOfDays, setMonthOfDays] = useState([]);
   const [infoCard, setInfoCard] = useState([]);
@@ -122,8 +136,7 @@ const MyCalendar = () => {
       date: yearMonth,
       day: day,
     });
-    // let items = await getItemList();
-    // console.log(items);
+
     setInfoCard(result);
     setShow(true);
   };
@@ -246,23 +259,21 @@ const MyCalendar = () => {
             <Card.Header as='h5'>項目</Card.Header>
             <Card.Body>
               <Card.Title></Card.Title>
-              <Card.Text>
                 {Object.entries(infoCard).map(([category, details]) => (
                   <div key={category}>
-                    <h6>{category}</h6>
+                    <span>{category}</span>
                     {Object.entries(details).map(([item, prices]) => (
                       <div key={item}>
                         <ul>
                           <strong>{item}:</strong>
                           {prices.reduce((total, p) => {
                             return (total += p);
-                          })}
+                          })}元
                         </ul>
                       </div>
                     ))}
                   </div>
                 ))}
-              </Card.Text>
             </Card.Body>
           </Card>
           <br />
@@ -290,7 +301,7 @@ const MyCalendar = () => {
                 <Form.Label>類別</Form.Label>
                 <Form.Control as='select' onChange={handleAmountChange}>
                   <option value={0}>請選擇</option>
-                  {classificationList.map((c, index) => (
+                  {subject.map((c, index) => (
                     <option key={index} value={index}>
                       {c}
                     </option>

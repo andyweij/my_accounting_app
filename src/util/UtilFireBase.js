@@ -11,6 +11,7 @@ import {
   collection,
   arrayUnion,
   getDocs,
+  FieldValue
 } from 'firebase/firestore';
 const firebaseConfig = {
   apiKey: 'AIzaSyA0yKuFTNSGZmQo_dq6x27Lb8LzSc7JhqE',
@@ -47,7 +48,7 @@ export const getDataByDay = async param => {
   // }
 };
 export const getItemList = async () => {
-  let dataMainPath = collection(db, 'item');
+  const dataMainPath = collection(db, 'item');
   const docSnap = await getDocs(dataMainPath);
   const result = {};
   docSnap.forEach(doc => {
@@ -66,3 +67,28 @@ await updateDoc(docRef, {
   //   data
   // });
 };
+export const removeItemData=async(array)=>{
+  const docRef = doc(db, "item/類別");
+  // 1. 先获取当前文档的数组数据
+  const docSnap = await getDoc(docRef);
+  await updateDoc(docRef, {
+          data: array
+      });
+}
+// if (docSnap.exists()) {
+//   const data = docSnap.data();
+//   const array = data.arrayField; // 替换 'arrayField' 为你的数组字段名
+
+//   // 2. 移除指定索引位置的元素，例如要移除第2个元素（索引为1）
+//   const indexToRemove = 1;
+//   array.splice(indexToRemove, 1);
+
+//   // 3. 更新文档中的数组字段
+//   await updateDoc(docRef, {
+//       arrayField: array
+//   });
+
+//   console.log("更新成功！");
+// } else {
+//   console.log("文档不存在！");
+// }

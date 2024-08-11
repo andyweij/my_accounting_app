@@ -21,8 +21,9 @@ import {
   createDataByFireStore,
   getDataByDay,
   getItemList,
+  removeItemData
 } from '../util/UtilFireBase';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus ,FaMinus} from 'react-icons/fa';
 import {
   collection,
   doc,
@@ -52,7 +53,6 @@ const MyCalendar = () => {
     setItems();
  
   },[subject.length])
-
   const handleClose = () => setShow(false);
   const [newItem, setNewItem] = useState('');
   
@@ -142,6 +142,12 @@ const MyCalendar = () => {
     setSubject(list => [...list, newItem]);
     setNewItem('')
   };
+  const removeItem=async(e)=>{
+    subject.splice(account.classification,1)
+    removeItemData(subject)
+    setSubject(subject)
+    initSelected()
+  }
   useEffect(() => {
     initMonth(currentYear, currentMonth);
   }, [currentYear, currentMonth]); // 依赖数组为空，只在组件初次渲染时调用
@@ -156,18 +162,24 @@ const MyCalendar = () => {
     ps: '',
   });
   const handleAmountChange = e => {
-    if (e.target.id == 'itemSelect') {
+    if (e.target.id === 'itemSelect') {
       setAccount(prevAccount => ({
         ...prevAccount,
         classification: e.target.value,
       }));
-    } else if (e.target.id == 'amount') {
+    } else if (e.target.id === 'amount') {
       setAccount(prevAccount => ({
         ...prevAccount,
         amount: e.target.value,
       }));
     }
   };
+  const initSelected=()=>{
+    setAccount(prevAccount => ({
+      ...prevAccount,
+      classification: 0,
+    }));
+  }
   const addAccount = e => {
     // createDataByDate(
     //   currentYear + '/' + currentMonth + '/' + account.classification,
@@ -295,14 +307,27 @@ const MyCalendar = () => {
               </Form.Group>
               <Form.Group className='mb-3' controlId='itemSelect'>
                 <Form.Label>類別</Form.Label>
-                <Form.Control as='select' onChange={handleAmountChange}>
+                <InputGroup>
+                <Form.Control as='select' onChange={handleAmountChange} value={account.classification}>
                   <option value={0}>請選擇</option>
                   {subject.map((c, index) => (
                     <option key={index} value={index}>
                       {c}
                     </option>
                   ))}
-                </Form.Control>
+                </Form.Control> 
+                <InputGroup.Text id='inputGroup-sizing-default'>
+               <Button  variant='link'
+                      style={{
+                        padding: '0',
+                        margin: '0',
+                        border: 'none',
+                        height: '100%',
+                      }}
+                      onClick={removeItem}><FaMinus/></Button>
+                      </InputGroup.Text>
+                      </InputGroup>
+                      
                 <br />
                 <InputGroup className='mb-3'>
                   <FormControl
@@ -325,6 +350,7 @@ const MyCalendar = () => {
                     >
                       <FaPlus />
                     </Button>
+                   
                   </InputGroup.Text>
                 </InputGroup>
               </Form.Group>

@@ -16,65 +16,47 @@ import {
 } from 'react-bootstrap';
 import { BiSolidLeftArrow, BiSolidRightArrow } from 'react-icons/bi';
 import {
-  getDataBaseData,
-  createDataByPath,
-  createDataByFireStore,
+  createAccountRecord,
+  createItem,
   getDataByDay,
   getItemList,
-  removeItemData
+  removeItemData,
 } from '../util/UtilFireBase';
-import { FaPlus ,FaMinus} from 'react-icons/fa';
-import {
-  collection,
-  doc,
-  setDoc,
-  getFirestore,
-  getDoc,
-  docRef,
-} from 'firebase/firestore';
-import { initializeApp } from 'firebase/app';
+import { FaPlus, FaMinus } from 'react-icons/fa';
 
 const MyCalendar = () => {
   const [show, setShow] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-  const [classificationList, setClassificationList] = useState([]);
-  const [subject,setSubject] = useState([])
-  useEffect(()=>{
-    const setItems = async()=>{
-      const subjects = await getItemList()
-      Object.entries(subjects).map(o=>{
-        if(o[0]=='類別'){
-          setSubject(o[1].data)  
+  const [selectedDate, setSelectedDate] = useState({
+    year: new Date().getFullYear(),
+    month: new Date().getMonth(),
+    day: new Date().getDay,
+  });
+  const [subject, setSubject] = useState([]);
+  useEffect(() => {
+    const setItems = async () => {
+      const subjects = await getItemList();
+      Object.entries(subjects).map(o => {
+        if (o[0] == '類別') {
+          setSubject(o[1].data);
         }
-      })
-      
+      });
     };
     setItems();
- 
-  },[subject.length])
-  const handleClose = () => setShow(false);
+  }, [subject.length]);
+
   const [newItem, setNewItem] = useState('');
-  
+
   const weekDays = { nl: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] };
   const [monthOfDays, setMonthOfDays] = useState([]);
   const [infoCard, setInfoCard] = useState([]);
   useEffect(() => {}, [infoCard]);
-  const getClassificationList = e => {
-    // getDataBaseData('classification/')
-    //   .then(data => {
-    //     setClassificationList(data);
-    //   })
-    //   .catch(error => {
-    //     console.error('Error fetching data:', error);
-    //   });
-  };
-  const formatDate = date => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+  const [account, setAccount] = useState({
+    amount: 0,
+    item: '',
+    ps: '',
+  });
 
   const getDaysInMonth = (year, month) => {
     return new Date(year, month, 0).getDate();
@@ -125,29 +107,29 @@ const MyCalendar = () => {
   };
   const getDataByDate = async e => {
     let day = e.target.value;
-    let yearMonth =
-      currentYear +
-      (currentMonth + 1 < 10 ? '0' + (currentMonth + 1) : currentMonth + 1);
+    let month =
+      currentMonth + 1 < 10 ? '0' + (currentMonth + 1) : currentMonth + 1;
+    let yearMonth = currentYear + month;
     let result = await getDataByDay({
       path: 'account',
       date: yearMonth,
       day: day,
     });
-
+    setSelectedDate({ year: currentYear, month: month, day: day });
     setInfoCard(result);
     setShow(true);
   };
   const addItem = e => {
-    createDataByFireStore('item/類別', newItem);
+    createItem('item/類別', newItem);
     setSubject(list => [...list, newItem]);
-    setNewItem('')
+    setNewItem('');
   };
-  const removeItem=async(e)=>{
-    subject.splice(account.classification,1)
-    removeItemData(subject)
-    setSubject(subject)
-    initSelected()
-  }
+  const removeItem = async e => {
+    subject.splice(account.item, 1);
+    removeItemData(subject);
+    setSubject(subject);
+    initSelected();
+  };
   useEffect(() => {
     initMonth(currentYear, currentMonth);
   }, [currentYear, currentMonth]); // 依赖数组为空，只在组件初次渲染时调用
@@ -156,36 +138,52 @@ const MyCalendar = () => {
   const handleSelect = selectedKey => {
     setActiveKey(selectedKey);
   };
-  const [account, setAccount] = useState({
-    amount: 0,
-    classification: '',
-    ps: '',
-  });
+
   const handleAmountChange = e => {
     if (e.target.id === 'itemSelect') {
       setAccount(prevAccount => ({
         ...prevAccount,
-        classification: e.target.value,
+        item: e.target.value,
       }));
     } else if (e.target.id === 'amount') {
       setAccount(prevAccount => ({
         ...prevAccount,
         amount: e.target.value,
       }));
+    } else if (e.target.id === 'ps') {
+      setAccount(prevAccount => ({
+        ...prevAccount,
+        ps: e.target.value,
+      }));
     }
   };
-  const initSelected=()=>{
+  const initSelected = () => {
     setAccount(prevAccount => ({
       ...prevAccount,
-      classification: 0,
+      item: 0,
     }));
-  }
-  const addAccount = e => {
-    // createDataByDate(
-    //   currentYear + '/' + currentMonth + '/' + account.classification,
-    //   account.amount,
-    // );
   };
+  const addRecord = e => {
+    if (account.item === '') {
+      alert('請選擇類別');
+      return;
+    } else if (parseInt(account.amount) === 0) {
+      alert('請輸入金額');
+      return;
+    }
+    let month =
+      currentMonth + 1 < 10 ? '0' + (currentMonth + 1) : currentMonth + 1;
+    createAccountRecord({
+      collection: currentYear + month,
+      day: selectedDate.day,
+      data: account.amount,
+      ps: account.ps,
+      item: subject[account.item],
+    });
+    setShow(false);
+  };
+
+  const handleClose = () => setShow(false);
 
   return (
     <Container className='d-flex justify-content-center mt-5 '>
@@ -267,21 +265,22 @@ const MyCalendar = () => {
             <Card.Header as='h5'>項目</Card.Header>
             <Card.Body>
               <Card.Title></Card.Title>
-                {Object.entries(infoCard).map(([category, details]) => (
-                  <div key={category}>
-                    <span>{category}</span>
-                    {Object.entries(details).map(([item, prices]) => (
-                      <div key={item}>
-                        <ul>
-                          <strong>{item}:</strong>
-                          {prices.reduce((total, p) => {
-                            return (total += p);
-                          })}元
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                ))}
+              {Object.entries(infoCard).map(([category, details]) => (
+                <div key={category}>
+                  <span>{category}</span>
+                  {Object.entries(details).map(([item, prices]) => (
+                    <div key={item}>
+                      <ul>
+                        <strong>{item}:</strong>
+                        {prices.reduce((total, p) => {
+                          return (total += p);
+                        })}
+                        元
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              ))}
             </Card.Body>
           </Card>
           <br />
@@ -308,26 +307,34 @@ const MyCalendar = () => {
               <Form.Group className='mb-3' controlId='itemSelect'>
                 <Form.Label>類別</Form.Label>
                 <InputGroup>
-                <Form.Control as='select' onChange={handleAmountChange} value={account.classification}>
-                  <option value={0}>請選擇</option>
-                  {subject.map((c, index) => (
-                    <option key={index} value={index}>
-                      {c}
-                    </option>
-                  ))}
-                </Form.Control> 
-                <InputGroup.Text id='inputGroup-sizing-default'>
-               <Button  variant='link'
+                  <Form.Control
+                    as='select'
+                    onChange={handleAmountChange}
+                    value={account.item}
+                  >
+                    <option value={''}>請選擇</option>
+                    {subject.map((item, index) => (
+                      <option key={index} value={index}>
+                        {item}
+                      </option>
+                    ))}
+                  </Form.Control>
+                  <InputGroup.Text id='inputGroup-sizing-default'>
+                    <Button
+                      variant='link'
                       style={{
                         padding: '0',
                         margin: '0',
                         border: 'none',
                         height: '100%',
                       }}
-                      onClick={removeItem}><FaMinus/></Button>
-                      </InputGroup.Text>
-                      </InputGroup>
-                      
+                      onClick={removeItem}
+                    >
+                      <FaMinus />
+                    </Button>
+                  </InputGroup.Text>
+                </InputGroup>
+
                 <br />
                 <InputGroup className='mb-3'>
                   <FormControl
@@ -350,16 +357,16 @@ const MyCalendar = () => {
                     >
                       <FaPlus />
                     </Button>
-                   
                   </InputGroup.Text>
                 </InputGroup>
               </Form.Group>
-              <Form.Group
-                className='mb-3'
-                controlId='exampleForm.ControlTextarea1'
-              >
+              <Form.Group className='mb-3' controlId='ps'>
                 <Form.Label>備註</Form.Label>
-                <Form.Control as='textarea' rows={3} />
+                <Form.Control
+                  as='textarea'
+                  rows={3}
+                  onChange={handleAmountChange}
+                />
               </Form.Group>
             </Form>
           )}
@@ -369,7 +376,7 @@ const MyCalendar = () => {
           <Button variant='secondary' onClick={handleClose}>
             Close
           </Button>
-          <Button variant='primary' onClick={addAccount}>
+          <Button variant='primary' onClick={addRecord}>
             新增
           </Button>
         </Modal.Footer>

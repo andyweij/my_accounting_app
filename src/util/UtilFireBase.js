@@ -4,6 +4,7 @@ import {
   doc,
   setDoc,
   getDoc,
+  addDoc,
   updateDoc,
   docRef,
   query,
@@ -11,7 +12,7 @@ import {
   collection,
   arrayUnion,
   getDocs,
-  FieldValue
+  FieldValue,
 } from 'firebase/firestore';
 const firebaseConfig = {
   apiKey: 'AIzaSyA0yKuFTNSGZmQo_dq6x27Lb8LzSc7JhqE',
@@ -29,7 +30,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 export const getDataByDay = async param => {
-  console.log(param);
   const dataMainPath = collection(db, param.path);
   const docRef = doc(dataMainPath, param.date);
   const dayInfo = collection(docRef, param.day);
@@ -39,6 +39,7 @@ export const getDataByDay = async param => {
   docSnap.forEach(doc => {
     result[doc.id] = doc.data();
   });
+  console.log(result);
   return result;
   // if (docSnap.exists()) {
   //   console.log('Document data:', docSnap.data());
@@ -47,6 +48,7 @@ export const getDataByDay = async param => {
   //   console.log('No such document!');
   // }
 };
+
 export const getItemList = async () => {
   const dataMainPath = collection(db, 'item');
   const docSnap = await getDocs(dataMainPath);
@@ -56,39 +58,27 @@ export const getItemList = async () => {
   });
   return result;
 };
-export const createDataByFireStore = async (path ,newItem)=> {
 
-const docRef = doc(db,path)
-await updateDoc(docRef, {
-  data: arrayUnion(newItem)
-});
-
-  // await setDoc(doc(db, path), {
-  //   data
-  // });
+export const createItem = async (path, newItem) => {
+  const docRef = doc(db, path);
+  await updateDoc(docRef, {
+    data: arrayUnion(newItem),
+  });
 };
-export const removeItemData=async(array)=>{
-  const docRef = doc(db, "item/類別");
+
+export const removeItemData = async array => {
+  const docRef = doc(db, 'item/類別');
   // 1. 先获取当前文档的数组数据
   const docSnap = await getDoc(docRef);
   await updateDoc(docRef, {
-          data: array
-      });
-}
-// if (docSnap.exists()) {
-//   const data = docSnap.data();
-//   const array = data.arrayField; // 替换 'arrayField' 为你的数组字段名
+    data: array,
+  });
+};
 
-//   // 2. 移除指定索引位置的元素，例如要移除第2个元素（索引为1）
-//   const indexToRemove = 1;
-//   array.splice(indexToRemove, 1);
-
-//   // 3. 更新文档中的数组字段
-//   await updateDoc(docRef, {
-//       arrayField: array
-//   });
-
-//   console.log("更新成功！");
-// } else {
-//   console.log("文档不存在！");
-// }
+export const createAccountRecord = newData => {
+  const docPath = doc(
+    db,
+    'account/' + newData.collection + '/' + newData.day + '/' + newData.item,
+  );
+  updateDoc(docPath, { [newData.ps]: arrayUnion(parseInt(newData.data)) });
+};

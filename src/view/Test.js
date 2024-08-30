@@ -72,6 +72,22 @@ const Test = () => {
     //     console.error(error);
     //   });
   };
+  class Animal {
+    constructor() {
+      console.log('Animal Create');
+      this.age = 17;
+    }
+  }
+  class Dog extends Animal {
+    constructor() {
+      super(console.log('Dog Create!'));
+    }
+    bark = ({ name }) => {
+      console.log(`woof${name} ${this.age}`);
+    };
+  }
+  const spot = new Dog();
+  console.log(spot.bark({ name: 'snoopy' }));
   return (
     <Container>
       <Row>

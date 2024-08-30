@@ -26,6 +26,7 @@ import {
   Sidebar,
 } from 'semantic-ui-react';
 import MyCalendar from './MyCalendar';
+import TestComponent from './TestComponent.js';
 import { Link, Routes, Route, useNavigate } from 'react-router-dom';
 const SidebarMenu = () => {
   return (
@@ -50,6 +51,7 @@ const SidebarMenu = () => {
       </Nav>
       <Routes>
         <Route path='MyCalendar' element={<MyCalendar />} />
+        <Route path='home' element={<TestComponent />} />
       </Routes>
     </Container>
   );

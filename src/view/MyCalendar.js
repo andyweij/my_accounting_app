@@ -163,7 +163,7 @@ const MyCalendar = () => {
       item: 0,
     }));
   };
-  const addRecord = e => {
+  const addAccountingRecord = e => {
     if (account.item === '') {
       alert('請選擇類別');
       return;
@@ -173,14 +173,19 @@ const MyCalendar = () => {
     }
     let month =
       currentMonth + 1 < 10 ? '0' + (currentMonth + 1) : currentMonth + 1;
-    createAccountRecord({
+    const createRs = createAccountRecord({
       collection: currentYear + month,
       day: selectedDate.day,
       data: account.amount,
       ps: account.ps,
       item: subject[account.item],
     });
-    setShow(false);
+    if (createRs) {
+      setAccount({ amount: 0, item: '', ps: '' });
+      setShow(false);
+    } else {
+      alert('新增錯誤');
+    }
   };
 
   const handleClose = () => setShow(false);
@@ -376,7 +381,7 @@ const MyCalendar = () => {
           <Button variant='secondary' onClick={handleClose}>
             Close
           </Button>
-          <Button variant='primary' onClick={addRecord}>
+          <Button variant='primary' onClick={addAccountingRecord}>
             新增
           </Button>
         </Modal.Footer>

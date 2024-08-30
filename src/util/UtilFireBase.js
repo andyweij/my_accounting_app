@@ -39,7 +39,6 @@ export const getDataByDay = async param => {
   docSnap.forEach(doc => {
     result[doc.id] = doc.data();
   });
-  console.log(result);
   return result;
   // if (docSnap.exists()) {
   //   console.log('Document data:', docSnap.data());
@@ -75,10 +74,39 @@ export const removeItemData = async array => {
   });
 };
 
-export const createAccountRecord = newData => {
-  const docPath = doc(
-    db,
-    'account/' + newData.collection + '/' + newData.day + '/' + newData.item,
-  );
-  updateDoc(docPath, { [newData.ps]: arrayUnion(parseInt(newData.data)) });
+export const createAccountRecord = async newData => {
+  try {
+    const docPath = doc(
+      db,
+      'account/' + newData.collection + '/' + newData.day + '/' + newData.item,
+    );
+    let result = await getDataByDay({
+      path: 'account/',
+      date: newData.collection,
+      day: newData.day,
+    });
+
+    if (Object.keys(result).find(r => r == newData.item) == undefined) {
+      await setDoc(
+        doc(
+          db,
+          'account' +
+            '/' +
+            newData.collection +
+            '/' +
+            newData.day +
+            '/' +
+            newData.item,
+        ),
+        { [newData.ps]: arrayUnion(parseInt(newData.data)) },
+      );
+    } else {
+      updateDoc(docPath, { [newData.ps]: arrayUnion(parseInt(newData.data)) });
+    }
+    return true;
+  } catch (error) {
+    console.error('Error creating/updating account record:', error);
+    // 如果发生异常，则返回 false
+    return false;
+  }
 };

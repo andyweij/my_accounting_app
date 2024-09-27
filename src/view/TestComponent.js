@@ -57,7 +57,7 @@ class List extends Component {
           <h1>{title}</h1>
           <h1>{this.state.text}</h1>
           <h1>{this.state.count}</h1>
-          <button onClick={this.updateState}>Add Count</button>
+          <button style={{backgroundColor:'Red'}} onClick={this.updateState}>Add Count</button>
           <br />
           <br />
           <TestProps text='test' />

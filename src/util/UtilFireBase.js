@@ -12,7 +12,10 @@ import {
   collection,
   arrayUnion,
   getDocs,
+  deleteDoc,
   FieldValue,
+  deleteField,
+  arrayRemove,
 } from 'firebase/firestore';
 const firebaseConfig = {
   apiKey: 'AIzaSyA0yKuFTNSGZmQo_dq6x27Lb8LzSc7JhqE',
@@ -102,6 +105,7 @@ export const createAccountRecord = async newData => {
       );
     } else {
       updateDoc(docPath, { [newData.ps]: arrayUnion(parseInt(newData.data)) });
+      console.log(docPath);
     }
     return true;
   } catch (error) {
@@ -109,4 +113,13 @@ export const createAccountRecord = async newData => {
     // 如果发生异常，则返回 false
     return false;
   }
+};
+export const deleteAccountRecord = async path => {
+  const docRef = doc(
+    db,
+    'account/' + path.collection + '/' + path.day + '/' + path.data,
+  );
+  updateDoc(docRef, {
+    [path.item]: deleteField(),
+  });
 };

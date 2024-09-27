@@ -1,17 +1,13 @@
 import { useState, useEffect } from 'react';
 import {
   Container,
-  Col,
-  Row,
   Button,
   Table,
   Card,
   InputGroup,
   Form,
   Nav,
-  Glyphicon,
   FormControl,
-  ButtonGroup,
   Modal,
 } from 'react-bootstrap';
 import { BiSolidLeftArrow, BiSolidRightArrow } from 'react-icons/bi';
@@ -21,6 +17,7 @@ import {
   getDataByDay,
   getItemList,
   removeItemData,
+  deleteAccountRecord,
 } from '../util/UtilFireBase';
 import { FaPlus, FaMinus } from 'react-icons/fa';
 
@@ -38,7 +35,7 @@ const MyCalendar = () => {
     const setItems = async () => {
       const subjects = await getItemList();
       Object.entries(subjects).map(o => {
-        if (o[0] == '類別') {
+        if (o[0] === '類別') {
           setSubject(o[1].data);
         }
       });
@@ -70,16 +67,16 @@ const MyCalendar = () => {
       for (let j = 0; j < weekDays.nl.length; j++) {
         const day = new Date(year, month, i);
         const dayOfWeek = day.getDay();
-        if (dayOfWeek == j || (j == 0 && dayOfWeek % 7 == 0)) {
+        if (dayOfWeek === j || (j === 0 && dayOfWeek % 7 === 0)) {
           days[count].push(i);
           break;
         }
 
-        if (count == 0 && i % 7 == 1) {
+        if (count === 0 && i % 7 === 1) {
           days[count].push('');
         }
       }
-      if (days[count].length == weekDays.nl.length) count++;
+      if (days[count].length === weekDays.nl.length) count++;
     }
     setMonthOfDays(days);
   };
@@ -187,15 +184,29 @@ const MyCalendar = () => {
       alert('新增錯誤');
     }
   };
-
+  const deleteRecord = e => {
+    let month =
+      currentMonth + 1 < 10 ? '0' + (currentMonth + 1) : currentMonth + 1;
+    let category = e.target.value.split('/')[0];
+    let item = e.target.value.split('/')[1];
+    console.log(category);
+    const deleteRs = deleteAccountRecord({
+      collection: currentYear + month,
+      day: selectedDate.day,
+      data: category,
+      ps: account.ps,
+      item: item,
+    });
+    setShow(false);
+  };
   const handleClose = () => setShow(false);
 
   return (
     <Container className='d-flex justify-content-center mt-5 '>
       <Table striped bordered hover>
         <thead>
-          <tr style={{ textAlign: 'center', backgroundColor: 'yellowgreen' }}>
-            <th colSpan={weekDays.nl.length}>
+          <tr>
+            <th style={{ textAlign: 'center', backgroundColor: 'yellowGreen' }} colSpan={weekDays.nl.length}>
               {' '}
               <a href='#' onClick={preMonth}>
                 <BiSolidLeftArrow />
@@ -223,14 +234,9 @@ const MyCalendar = () => {
               </a>
             </th>
           </tr>
-          <tr
-            style={{
-              textAlign: 'center',
-              backgroundColor: 'burlywood',
-            }}
-          >
+          <tr>
             {weekDays.nl.map((w, index) => (
-              <th key={index} style={{ textAlign: 'center' }}>
+              <th key={index} style={{ textAlign: 'center',backgroundColor: 'burlywood', }}>
                 {w}
               </th>
             ))}
@@ -275,15 +281,31 @@ const MyCalendar = () => {
                   <span>{category}</span>
                   {Object.entries(details).map(([item, prices]) => (
                     <div key={item}>
-                      <ul>
+                      <ul
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
                         <strong>{item}:</strong>
                         {prices.reduce((total, p) => {
                           return (total += p);
                         })}
-                        元
+                        元<span style={{ flexGrow: 1 }}></span>
+                        <div>
+                          <Button
+                            className='rounded-pill px-4'
+                            variant='outline-primary'
+                            onClick={deleteRecord}
+                            value={category + '/' + item}
+                          >
+                            刪除
+                          </Button>
+                        </div>
                       </ul>
                     </div>
                   ))}
+                  <hr />
                 </div>
               ))}
             </Card.Body>

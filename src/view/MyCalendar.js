@@ -20,7 +20,9 @@ import {
   deleteAccountRecord,
 } from '../util/UtilFireBase';
 import { FaPlus, FaMinus } from 'react-icons/fa';
-
+import AccountDonut from './AccountDonut.js';
+import { css } from 'highcharts';
+import { donut } from '../css/donut.css';
 const MyCalendar = () => {
   const [show, setShow] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
@@ -200,13 +202,16 @@ const MyCalendar = () => {
     setShow(false);
   };
   const handleClose = () => setShow(false);
-
+  <script src='AccountDonut.jsx'>123</script>;
   return (
     <Container className='d-flex justify-content-center mt-5 '>
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th style={{ textAlign: 'center', backgroundColor: 'yellowGreen' }} colSpan={weekDays.nl.length}>
+            <th
+              style={{ textAlign: 'center', backgroundColor: 'yellowGreen' }}
+              colSpan={weekDays.nl.length}
+            >
               {' '}
               <a href='#' onClick={preMonth}>
                 <BiSolidLeftArrow />
@@ -236,7 +241,10 @@ const MyCalendar = () => {
           </tr>
           <tr>
             {weekDays.nl.map((w, index) => (
-              <th key={index} style={{ textAlign: 'center',backgroundColor: 'burlywood', }}>
+              <th
+                key={index}
+                style={{ textAlign: 'center', backgroundColor: 'burlywood' }}
+              >
                 {w}
               </th>
             ))}
@@ -408,6 +416,9 @@ const MyCalendar = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      {/* <div>
+        <AccountDonut />
+      </div> */}
     </Container>
   );
 };

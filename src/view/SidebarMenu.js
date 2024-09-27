@@ -27,6 +27,7 @@ import {
 } from 'semantic-ui-react';
 import MyCalendar from './MyCalendar';
 import TestComponent from './TestComponent.js';
+import AccountDonut from './AccountDonut.js';
 import { Link, Routes, Route, useNavigate } from 'react-router-dom';
 const SidebarMenu = () => {
   return (
@@ -44,14 +45,15 @@ const SidebarMenu = () => {
           </Nav.Link>
         </Nav.Item>
         <Nav.Item>
-          <Nav.Link eventKey='disabled' disabled>
-            Disabled
+          <Nav.Link as={Link} eventKey='AccountDonut' to='/AccountDonut'>
+            AccountDonut
           </Nav.Link>
         </Nav.Item>
       </Nav>
       <Routes>
         <Route path='MyCalendar' element={<MyCalendar />} />
         <Route path='home' element={<TestComponent />} />
+        <Route path='AccountDonut' element={<AccountDonut />} />
       </Routes>
     </Container>
   );
